@@ -1,10 +1,10 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: Create CodePipeline to deploy CloudFormation stack from GitHub
+Description: CodePipeline using GitHub (via CodeStar Connection) to deploy CloudFormation
 
 Parameters:
   ArtifactBucketName:
     Type: String
-    Description: Name of the S3 bucket for CodePipeline artifacts
+    Description: Name of the existing S3 bucket for pipeline artifacts
 
 Resources:
   CodePipelineServiceRole:
@@ -22,7 +22,6 @@ Resources:
         - arn:aws:iam::aws:policy/AWSCodePipeline_ReadOnlyAccess
         - arn:aws:iam::aws:policy/AWSCloudFormationFullAccess
         - arn:aws:iam::aws:policy/AmazonS3FullAccess
-        - arn:aws:iam::aws:policy/AWSCodeBuildAdminAccess # Optional, but useful if you later add a build stage
 
   GitHubPipeline:
     Type: AWS::CodePipeline::Pipeline
@@ -37,14 +36,14 @@ Resources:
             - Name: GitHub_Source
               ActionTypeId:
                 Category: Source
-                Owner: ThirdParty
-                Provider: GitHub
+                Owner: AWS
+                Provider: CodeStarSourceConnection
                 Version: 1
               Configuration:
-                Owner: lambarahul9650
-                Repo: pipeline
-                Branch: master
-                PollForSourceChanges: true
+                ConnectionArn: arn:aws:codeconnections:us-east-1:590184034534:connection/479bcb6a-a041-48b2-a3c6-0dc0d9951c60
+                FullRepositoryId: lambarahul9650/pipeline
+                BranchName: master
+                OutputArtifactFormat: CODE_ZIP
               OutputArtifacts:
                 - Name: SourceOutput
 
